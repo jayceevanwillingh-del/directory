@@ -3,23 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Directory</title>
+    <title>MNED Staff Directory</title>
     <style>
-        /* YOUR ORIGINAL CSS - DO NOT CHANGE */
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f9; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .menu-btn { padding: 30px; font-size: 18px; cursor: pointer; background: #0078d4; color: white; border: none; border-radius: 10px; text-align: center; font-weight: bold; }
-        .person-card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        #directory-view { display: none; }
-        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal { background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; }
-        .act-btn { text-decoration: none; font-size: 20px; margin-left: 10px; }
+        /* --- PROFESSIONAL UI STYLING --- */
+        :root {
+            --primary-blue: #005596;
+            --hover-blue: #003d6b;
+            --bg-grey: #f0f2f5;
+            --text-dark: #1c1e21;
+            --card-white: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-grey); 
+            color: var(--text-dark);
+        }
+
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
+
+        header { text-align: center; padding: 40px 0; }
+        header h1 { margin: 0; color: var(--primary-blue); font-size: 2.5rem; }
+        header p { color: #65676b; font-size: 1.1rem; }
+
+        /* --- THE ORIGINAL CLICKABLE TILES --- */
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+
+        .menu-btn { 
+            background: var(--card-white);
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid var(--primary-blue);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+        }
+
+        .menu-btn:hover { 
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* --- STAFF CARD LIST VIEW --- */
+        #directory-view { display: none; animation: fadeIn 0.4s ease; }
+        
+        .back-btn {
+            background: none; border: 1px solid var(--primary-blue);
+            color: var(--primary-blue); padding: 10px 20px;
+            border-radius: 6px; cursor: pointer; font-weight: bold;
+            margin-bottom: 25px; transition: 0.2s;
+        }
+
+        .back-btn:hover { background: var(--primary-blue); color: white; }
+
+        .staff-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .person-card { 
+            background: white; padding: 20px; border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: 0.2s;
+        }
+
+        .person-card:hover { border-left: 6px solid var(--primary-blue); }
+
+        .person-info h3 { margin: 0; color: var(--primary-blue); }
+        .person-info p { margin: 5px 0; color: #555; font-size: 0.9rem; }
+
+        .actions { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .actions a { 
+            text-decoration: none; font-size: 1.2rem; margin-right: 15px; 
+            color: var(--primary-blue); transition: 0.2s;
+        }
+        .actions a:hover { opacity: 0.7; }
+
+        /* --- MODAL --- */
+        #modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); justify-content: center; align-items: center; 
+            backdrop-filter: blur(4px);
+        }
+        .modal { 
+            background: white; padding: 30px; border-radius: 15px; 
+            max-width: 450px; width: 90%; position: relative;
+        }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div id="home-view">
-        <h1>MNED Staff Directory</h1>
+        <header>
+            <h1>MNED Staff Directory</h1>
+            <p>Select a department to explore our team</p>
+        </header>
         <div class="menu-grid">
             <div class="menu-btn" onclick="openDept('Curriculum')">Curriculum</div>
             <div class="menu-btn" onclick="openDept('ISLES')">ISLES</div>
@@ -31,100 +126,93 @@
     </div>
 
     <div id="directory-view">
-        <button onclick="location.reload()" style="padding:10px; cursor:pointer;">⬅ Back to Menu</button>
-        <h2 id="dept-title" style="color:#0078d4;"></h2>
-        <div id="people-grid"></div>
+        <button class="back-btn" onclick="location.reload()">⬅ Back to Departments</button>
+        <h2 id="dept-title" style="border-left: 5px solid var(--primary-blue); padding-left: 15px;"></h2>
+        <div id="people-grid" class="staff-grid"></div>
     </div>
+</div>
 
-    <div id="modal-overlay" onclick="this.style.display='none'">
-        <div class="modal" onclick="event.stopPropagation()">
-            <h2 id="m-name"></h2>
-            <p><strong>Role:</strong> <span id="m-role"></span></p>
-            <p><strong>Email:</strong> <span id="m-email"></span></p>
-            <p><strong>Phone:</strong> <span id="m-phone"></span></p>
-            <p><strong>Office:</strong> <span id="m-office"></span></p>
-            <button onclick="document.getElementById('modal-overlay').style.display='none'">Close</button>
-        </div>
+<div id="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h2 id="m-name" style="color:var(--primary-blue); margin-top:0;"></h2>
+        <p><strong>Position:</strong> <span id="m-role"></span></p>
+        <p><strong>Email:</strong> <span id="m-email"></span></p>
+        <p><strong>Extension:</strong> <span id="m-phone"></span></p>
+        <p><strong>Office No:</strong> <span id="m-office"></span></p>
+        <button class="back-btn" style="width:100%; margin-top:15px;" onclick="document.getElementById('modal-overlay').style.display='none'">Close Profile</button>
     </div>
+</div>
 
-    <script>
-        let fullData = [];
+<script>
+    let fullData = [];
 
-        // 1. AUTOMATIC DATA LOAD
-        window.onload = function() {
-            fetch('directory.csv') // Your file must be named this exactly
-                .then(response => response.text())
-                .then(text => {
-                    fullData = parseCSV(text);
-                    console.log("Data loaded successfully");
-                })
-                .catch(err => console.error("Could not load directory.csv"));
-        };
+    // Auto-fetch data
+    window.onload = function() {
+        fetch('directory.csv')
+            .then(res => res.text())
+            .then(text => {
+                fullData = parseCSV(text);
+                console.log("Directory Active");
+            })
+            .catch(err => console.error("CSV Missing"));
+    };
 
-        // 2. CSV PARSER (Matches your column names)
-        function parseCSV(text) {
-            const lines = text.split('\n').filter(l => l.trim() !== '');
-            const headers = lines[0].split(',').map(h => h.trim());
-            return lines.slice(1).map(line => {
-                const values = line.split(',');
-                let obj = {};
-                headers.forEach((h, i) => {
-                    obj[h] = values[i] ? values[i].trim() : '';
-                });
-                return obj;
-            });
-        }
+    function parseCSV(text) {
+        const lines = text.split('\n').filter(l => l.trim() !== '');
+        const headers = lines[0].split(',').map(h => h.trim());
+        return lines.slice(1).map(line => {
+            const values = line.split(',');
+            let obj = {};
+            headers.forEach((h, i) => { obj[h] = values[i] ? values[i].trim() : ''; });
+            return obj;
+        });
+    }
 
-        // 3. TILE CLICK FUNCTION
-        function openDept(dept) {
-            // REMOVED the "Please upload" blocking alert
-            document.getElementById('home-view').style.display = 'none';
-            document.getElementById('directory-view').style.display = 'block';
-            document.getElementById('dept-title').innerText = dept;
-            
-            const filtered = fullData.filter(p => 
-                (p.Department || '').toLowerCase().includes(dept.toLowerCase().split(' ')[0])
-            );
-            render(filtered);
-        }
+    function openDept(dept) {
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('directory-view').style.display = 'block';
+        document.getElementById('dept-title').innerText = dept;
+        
+        // Matches the button name to the CSV Department column
+        const filtered = fullData.filter(p => 
+            (p.Department || '').toLowerCase().includes(dept.toLowerCase().split(' ')[0])
+        );
+        render(filtered);
+    }
 
-        // 4. DISPLAY THE LIST
-        function render(list) {
-            const grid = document.getElementById('people-grid');
-            grid.innerHTML = list.length ? "" : "<h3>No matching records found in directory.csv</h3>";
-            
-            list.sort((a,b) => (a.Name || "").localeCompare(b.Name || "")).forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'person-card';
-                div.innerHTML = `
-                    <div onclick="showPerson('${p.Name}')" style="cursor:pointer">
-                        <h3 style="margin:0;">${p.Name}</h3>
-                        <p style="margin:5px 0 0; color:#666;">${p.Role}</p>
-                    </div>
-                    <div class="actions">
-                        <a href="mailto:${p.Email}" class="act-btn">✉️</a>
-                        <a href="tel:${p.Phone}" class="act-btn">📞</a>
-                    </div>
-                `;
-                grid.appendChild(div);
-            });
-        }
+    function render(list) {
+        const grid = document.getElementById('people-grid');
+        grid.innerHTML = list.length ? "" : "<h3>No staff records found in this category.</h3>";
+        
+        list.sort((a,b) => a.Name.localeCompare(b.Name)).forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'person-card';
+            div.innerHTML = `
+                <div class="person-info" onclick="showPerson('${p.Name}')" style="cursor:pointer">
+                    <h3>${p.Name}</h3>
+                    <p><strong>${p.Role}</strong></p>
+                    <p>📍 Office: ${p.Office || 'Main'}</p>
+                </div>
+                <div class="actions">
+                    <a href="mailto:${p.Email}" title="Send Email">✉️ Email</a>
+                    <a href="tel:${p.Phone}" title="Call Office">📞 Call</a>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
 
-        // 5. MODAL POPUP
-        function showPerson(name) {
-            const p = fullData.find(x => x.Name === name);
-            if (!p) return;
-            document.getElementById('m-name').innerText = p.Name;
-            document.getElementById('m-role').innerText = p.Role || 'N/A';
-            document.getElementById('m-email').innerText = p.Email || 'N/A';
-            document.getElementById('m-phone').innerText = p.Phone || 'N/A';
-            document.getElementById('m-office').innerText = p.Office || 'N/A';
-            document.getElementById('modal-overlay').style.display = 'flex';
-        }
-    </script>
+    function showPerson(name) {
+        const p = fullData.find(x => x.Name === name);
+        if (!p) return;
+        document.getElementById('m-name').innerText = p.Name;
+        document.getElementById('m-role').innerText = p.Role;
+        document.getElementById('m-email').innerText = p.Email;
+        document.getElementById('m-phone').innerText = p.Phone;
+        document.getElementById('m-office').innerText = p.Office;
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+</script>
+
 </body>
 </html>
-      
-
-
-
