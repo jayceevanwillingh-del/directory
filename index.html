@@ -9,34 +9,31 @@
 
     <style>
         :root {
-            --primary: #005596; /* Western Cape Blue */
-            --accent: #ffcc00;  /* Gold accent */
-            --grey: #f4f4f9;
+            --primary: #005596;
+            --accent: #ffcc00;
+            --bg: #f4f4f9;
         }
 
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--grey); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); }
 
-        /* --- THE BANNER FIX --- */
+        /* --- THE BANNER (Update image name below) --- */
         .banner {
-            background: linear-gradient(rgba(0, 85, 150, 0.9), rgba(0, 85, 150, 0.9)), 
-                        url('https://www.westerncape.gov.za/assets/styles/wcg_theme/logo.png'); /* Placeholder for your banner */
+            background: linear-gradient(rgba(0, 85, 150, 0.5), rgba(0, 85, 150, 0.5)), 
+                        url('banner.jpg'); /* CHANGE THIS to your image name */
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 60px 20px;
+            padding: 80px 20px;
             text-align: center;
-            border-bottom: 5px solid var(--accent);
+            border-bottom: 6px solid var(--accent);
         }
 
-        .banner h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; }
-        .banner p { margin-top: 10px; font-size: 1.2rem; opacity: 0.9; }
-
-        /* --- THE TILES (GRID) --- */
-        .container { max-width: 1100px; margin: -30px auto 40px; padding: 0 20px; }
+        /* --- THE TILES --- */
+        .container { max-width: 1100px; margin: -40px auto 40px; padding: 0 20px; }
         
         .menu-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 20px; 
         }
 
@@ -45,48 +42,43 @@
             padding: 40px 20px;
             text-align: center;
             border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             color: var(--primary);
             font-weight: bold;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
+            border: none; /* Fixes potential button border issues */
         }
 
-        .menu-btn i { font-size: 3rem; color: var(--primary); } /* Icon Style */
+        .menu-btn i { font-size: 2.5rem; }
 
         .menu-btn:hover { 
             background: var(--primary); 
             color: white; 
             transform: translateY(-10px); 
         }
-        .menu-btn:hover i { color: white; }
 
-        /* --- STAFF LIST DESIGN --- */
-        #directory-view { display: none; padding: 20px; animation: slideUp 0.4s ease; }
+        /* --- DIRECTORY VIEW --- */
+        #directory-view { display: none; padding-top: 60px; }
         
         .person-card { 
-            background: white; padding: 20px; border-radius: 10px;
-            margin-bottom: 15px; display: flex; justify-content: space-between;
+            background: white; padding: 15px 25px; border-radius: 10px;
+            margin-bottom: 12px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary);
+            border-left: 6px solid var(--primary);
         }
 
-        .actions a { 
-            color: var(--primary); font-size: 1.5rem; margin-left: 20px; 
-            text-decoration: none; transition: 0.2s;
-        }
-        
         .back-btn {
             background: var(--primary); color: white; border: none;
-            padding: 12px 25px; border-radius: 5px; cursor: pointer;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer;
             margin-bottom: 20px; font-weight: bold;
         }
 
-        @keyframes slideUp { from {opacity:0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+        .actions a { color: var(--primary); font-size: 1.3rem; margin-left: 15px; }
     </style>
 </head>
 <body>
@@ -128,23 +120,31 @@
     </div>
 
     <div id="directory-view" class="container">
-        <button class="back-btn" onclick="location.reload()">⬅ Back to Departments</button>
-        <h2 id="dept-title" style="color:var(--primary);"></h2>
+        <button class="back-btn" onclick="window.location.reload()">⬅ Back to Departments</button>
+        <h2 id="dept-title" style="color:var(--primary); text-transform: uppercase;"></h2>
         <div id="people-grid"></div>
     </div>
 
     <script>
         let fullData = [];
 
+        // Fetch data immediately when page loads
         window.onload = function() {
             fetch('directory.csv')
                 .then(res => res.text())
-                .then(text => { fullData = parseCSV(text); })
-                .catch(err => console.error("CSV file not found."));
+                .then(text => {
+                    fullData = parseCSV(text);
+                    console.log("System Ready: " + fullData.length + " staff loaded.");
+                })
+                .catch(err => {
+                    console.error("CSV Missing!");
+                    alert("System Error: directory.csv not found.");
+                });
         };
 
         function parseCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
+            if (lines.length === 0) return [];
             const headers = lines[0].split(',').map(h => h.trim());
             return lines.slice(1).map(line => {
                 const values = line.split(',');
@@ -155,36 +155,48 @@
         }
 
         function openDept(dept) {
+            // Logic to switch views
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('directory-view').style.display = 'block';
             document.getElementById('dept-title').innerText = dept;
-            const filtered = fullData.filter(p => (p.Department || '').toLowerCase().includes(dept.toLowerCase().split(' ')[0]));
+
+            // Filter logic
+            const filtered = fullData.filter(p => {
+                const pDept = (p.Department || '').toLowerCase();
+                const search = dept.toLowerCase();
+                // Special case for 'Management' or 'Circuit' keywords
+                return pDept.includes(search.split(' ')[0]);
+            });
+
             render(filtered);
         }
 
         function render(list) {
             const grid = document.getElementById('people-grid');
-            grid.innerHTML = list.length ? "" : "<h3>No records found.</h3>";
-            list.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'person-card';
-                div.innerHTML = `
+            grid.innerHTML = ""; // Clear old data
+
+            if (list.length === 0) {
+                grid.innerHTML = "<h3>No matching staff records found in directory.csv</h3>";
+                return;
+            }
+
+            list.sort((a,b) => (a.Name || "").localeCompare(b.Name || "")).forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'person-card';
+                card.innerHTML = `
                     <div>
                         <h3 style="margin:0; color:var(--primary);">${p.Name}</h3>
-                        <p style="margin:5px 0; color:#666;">${p.Role}</p>
+                        <p style="margin:5px 0; color:#666; font-size: 0.9rem;">${p.Role}</p>
                     </div>
                     <div class="actions">
                         <a href="mailto:${p.Email}"><i class="fa-solid fa-envelope"></i></a>
                         <a href="tel:${p.Phone}"><i class="fa-solid fa-phone"></i></a>
                     </div>
                 `;
-                grid.appendChild(div);
+                grid.appendChild(card);
             });
         }
     </script>
 </body>
 </html>
-      
-      
-       
-   
+     
