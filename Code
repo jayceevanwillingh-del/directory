@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MNED Internal Directory</title>
+    <style>
+        :root {
+            --p-blue: #001489; --wcg-red: #BA0C2F; --wcg-green: #8FAD15;
+            --wcg-orange: #E35205; --wcg-teal: #7FA9AE; --wcg-pink: #C8126E;
+            --wcg-steel: #5B7F95; --bg: #f4f7f9;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; color: #333; }
+        
+        /* HEADER AREA */
+        .header-banner { background: var(--p-blue); border-bottom: 5px solid #FFB800; }
+        .header-banner <h1 style="color:white; text-align:center; padding:20px; margin:0; letter-spacing:3px;">MNED INTERNAL DIRECTORY</h1>
+	
+
+        .search-strip { background: white; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .search-box { width: 70%; max-width: 600px; padding: 15px 25px; border-radius: 30px; border: 2px solid #eee; outline: none; font-size: 1rem; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; text-align: center; }
+
+        /* HUB TILES */
+        #home-view { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .card { 
+            background: white; padding: 45px 20px; border-radius: 15px; cursor: pointer; transition: 0.3s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 8px solid var(--p-blue); 
+        }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        .card h2 { margin: 15px 0 0; letter-spacing: 1px; font-size: 1.3rem; }
+        
+        /* DIRECTORY LIST */
+        #directory-view { display: none; }
+        .people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 25px; }
+        
+        .person-card { 
+            background: white; padding: 20px; border-radius: 12px; text-align: left; 
+            border-left: 8px solid var(--p-blue); box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .person-info { cursor: pointer; }
+        .person-info h3 { margin: 0; color: var(--p-blue); font-size: 1.1rem; text-transform: uppercase; }
+        .person-info p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+
+        /* QUICK ACTION ICONS */
+        .actions { display: flex; gap: 12px; }
+        .act-btn { 
+            text-decoration: none; width: 45px; height: 45px; background: #f0f2f5; 
+            display: flex; align-items: center; justify-content: center; border-radius: 50%; 
+            font-size: 1.3rem; transition: 0.2s;
+        }
+        .act-btn:hover { background: var(--p-blue); filter: brightness(1.5); transform: scale(1.1); }
+
+        /* MODAL */
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,137,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: white; padding: 35px; border-radius: 20px; width: 380px; text-align: center; }
+        .vcard-btn { background: var(--wcg-green); color: white; width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <img src="image_9943fa.png" alt="MNED Header">
+</div>
+
+<div class="search-strip">
+    <input type="text" id="main-search" class="search-box" placeholder="Find anyone by name or role..." onkeyup="handleSearch()">
+</div>
+
+<div class="container">
+    <div id="upload-section" style="margin-bottom: 40px; background: white; padding: 30px; border-radius: 15px; border: 2px dashed var(--p-blue);">
+        <h3 style="margin-top:0">Upload Master Excel File</h3>
+        <input type="file" id="upload-excel" accept=".xlsx, .xls" />
+    </div>
+
+    <div id="home-view">
+        <div class="card admin" onclick="openDept('Admin')"><span style="font-size:3.5rem">📁</span><h2>ADMIN</h2></div>
+        <div class="card mg" onclick="openDept('M&G')" style="border-color: var(--wcg-red)"><span style="font-size:3.5rem">⚖️</span><h2>M&G</h2></div>
+        <div class="card trans" onclick="openDept('Transport')" style="border-color: var(--wcg-orange)"><span style="font-size:3.5rem">🚐</span><h2>TRANSPORT</h2></div>
+        <div class="card curr" onclick="openDept('Curriculum')" style="border-color: var(--wcg-green)"><span style="font-size:3.5rem">📚</span><h2>CURRICULUM</h2></div>
+        <div class="card dmt" onclick="openDept('DMT')" style="border-color: var(--wcg-teal)"><span style="font-size:3.5rem">💻</span><h2>DMT</h2></div>
+        <div class="card isles" onclick="openDept('ISLES')" style="border-color: var(--wcg-pink)"><span style="font-size:3.5rem">🌍</span><h2>ISLES</h2></div>
+        <div class="card contact" onclick="window.open('PASTE_LINK_HERE', '_blank')" style="border-color: var(--wcg-steel)"><span style="font-size:3.5rem">📝</span><h2>CONTACT US</h2></div>
+    </div>
+
+    <div id="directory-view">
+        <button onclick="goHome()" style="padding:10px 25px; cursor:pointer; background:var(--wcg-steel); color:white; border:none; border-radius:5px; margin-bottom:20px; font-weight:bold;">← BACK</button>
+        <h2 id="dept-title" style="color:var(--p-blue); text-transform: uppercase;"></h2>
+        <div class="people-grid" id="people-grid"></div>
+    </div>
+</div>
+
+<div id="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div style="font-size:4rem; color:#eee">👤</div>
+        <h2 id="m-name" style="color:var(--p-blue); margin: 10px 0 5px 0;"></h2>
+        <p id="m-role" style="font-weight:bold; color:#666;"></p>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        <div style="text-align: left; line-height: 2.2;">
+            <strong>📧 Email:</strong> <span id="m-email"></span><br>
+            <strong>📞 Phone:</strong> <span id="m-phone"></span><br>
+            <strong>🏢 Office:</strong> <span id="m-office"></span>
+        </div>
+        <button class="vcard-btn" id="vcard-trigger">💾 Save to Contacts</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    let fullData = [];
+
+    // SMART EXCEL READER
+    document.getElementById('upload-excel').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const raw = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                // MAPPING FORMULA: Matches even if Excel names are slightly different
+                fullData = raw.map(r => ({
+                    Name: r.Name || r.NAME || r['Full Name'] || "Unknown",
+                    Role: r.Role || r.ROLE || r.Position || r['Job Title'] || "",
+                    Department: r.Department || r.Dept || r.DEPT || r.Section || "",
+                    Email: r.Email || r.EMAIL || "",
+                    Phone: r.Phone || r.PHONE || r.Number || "",
+                    Office: r.Office || r.OFFICE || r.Location || ""
+                }));
+
+                alert("Successfully loaded " + fullData.length + " staff members!");
+                document.getElementById('upload-section').style.display = 'none';
+            } catch (err) { alert("Error reading file: " + err.message); }
+        };
+        reader.readAsArrayBuffer(e.target.files[0]);
+    });
+
+    function openDept(dept) {
+        if(!fullData.length) return alert("Please upload your Excel file first!");
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('directory-view').style.display = 'block';
+        document.getElementById('dept-title').innerText = dept;
+        const filtered = fullData.filter(p => (p.Department || '').toLowerCase().includes(dept.toLowerCase().split('&')[0]));
+        render(filtered);
+    }
+
+    function render(list) {
+        const grid = document.getElementById('people-grid');
+        grid.innerHTML = list.length ? "" : "<h3>No matching records.</h3>";
+        list.sort((a,b) => a.Name.localeCompare(b.Name)).forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'person-card';
+            div.innerHTML = `
+                <div class="person-info" onclick="showPerson('${p.Name}')">
+                    <h3>${p.Name}</h3>
+                    <p>${p.Role}</p>
+                </div>
+                <div class="actions">
+                    <a href="mailto:${p.Email}" class="act-btn" title="Email">✉️</a>
+                    <a href="tel:${p.Phone}" class="act-btn" title="Call">📞</a>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function showPerson(name) {
+        const p = fullData.find(x => x.Name === name);
+        document.getElementById('m-name').innerText = p.Name;
+        document.getElementById('m-role').innerText = p.Role;
+        document.getElementById('m-email').innerText = p.Email || 'N/A';
+        document.getElementById('m-phone').innerText = p.Phone || 'N/A';
+        document.getElementById('m-office').innerText = p.Office || 'N/A';
+        
+        document.getElementById('vcard-trigger').onclick = () => {
+            const vcf = `BEGIN:VCARD\nFN:${p.Name}\nTEL:${p.Phone}\nEMAIL:${p.Email}\nEND:VCARD`;
+            const blob = new Blob([vcf], {type:'text/vcard'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = p.Name + '.vcf'; a.click();
+        };
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function handleSearch() {
+        const t = document.getElementById('main-search').value.toLowerCase();
+        if(t && fullData.length) {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('directory-view').style.display = 'block';
+            document.getElementById('dept-title').innerText = "Search Results";
+            render(fullData.filter(p => Object.values(p).join(' ').toLowerCase().includes(t)));
+        } else if (!t) { goHome(); }
+    }
+
+    function goHome() {
+        document.getElementById('home-view').style.display = 'grid';
+        document.getElementById('directory-view').style.display = 'none';
+    }
+</script>
+</body>
+</html>
