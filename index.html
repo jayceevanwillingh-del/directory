@@ -17,11 +17,17 @@
             align-items: center; color: white; border-bottom: 6px solid var(--gold);
         }
 
-        /* SEARCH */
-        .search-container { max-width: 600px; margin: -25px auto 30px; padding: 0 20px; }
+        /* SEARCH BAR - IMPROVED AESTHETICS */
+        .search-container { max-width: 600px; margin: -25px auto 30px; padding: 0 20px; position: relative; }
         #searchBox {
-            width: 100%; padding: 15px 25px; border-radius: 50px; border: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); font-size: 1rem; outline: none;
+            width: 100%; padding: 18px 25px; border-radius: 50px; border: 2px solid transparent;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-size: 1.1rem; outline: none;
+            transition: all 0.3s ease;
+        }
+        #searchBox:focus {
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(0,85,150,0.2);
+            transform: scale(1.02);
         }
 
         /* TILES */
@@ -91,115 +97,7 @@
             <div class="tile" onclick="openDept('Management')"><i class="fa-solid fa-user-tie"></i>Management & Gov</div>
             <div class="tile" onclick="openDept('Finance')"><i class="fa-solid fa-coins"></i>Finance/SCM</div>
             <div class="tile" onclick="openDept('DMT')"><i class="fa-solid fa-laptop"></i>DMT (IT)</div>
-            <div class="tile" onclick="openDept('Circuit')"><i class="fa-solid fa-map-pin"></i>All Circuits</div>
-        </div>
-    </div>
-</div>
-
-<div id="directory-section" class="container">
-    <button class="btn-back" onclick="goHome()">⬅ Back to Departments</button>
-    <h2 id="dept-name" style="color:var(--blue)"></h2>
-    <div id="list-container"></div>
-</div>
-
-<div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <i class="fa-solid fa-circle-user" style="font-size: 4rem; color: var(--blue); margin-bottom: 15px;"></i>
-        <h2 id="popName">Staff Name</h2>
-        <p id="popRole" style="font-weight: bold; color: var(--gold);"></p>
-        <hr style="opacity: 0.2; margin: 20px 0;">
-        <p><i class="fa-solid fa-building"></i> Office: <span id="popOffice"></span></p>
-        <p><i class="fa-solid fa-envelope"></i> <span id="popEmail"></span></p>
-        <p><i class="fa-solid fa-phone"></i> Ext: <span id="popPhone"></span></p>
-        
-        <div class="modal-actions">
-            <a id="mailLink" href=""><i class="fa-solid fa-envelope"></i> Email</a>
-            <a id="callLink" href=""><i class="fa-solid fa-phone"></i> Call</a>
-        </div>
-    </div>
-</div>
-
-<script>
-    let staffData = [];
-
-    async function loadData() {
-        try {
-            const response = await fetch('directory.csv');
-            const data = await response.text();
-            const rows = data.split('\n').filter(r => r.trim() !== '');
-            const headers = rows[0].split(',').map(h => h.trim());
-            staffData = rows.slice(1).map(row => {
-                const values = row.split(',');
-                let person = {};
-                headers.forEach((h, i) => person[h] = values[i] ? values[i].trim() : '');
-                return person;
-            });
-        } catch (e) { console.error("CSV Load Error"); }
-    }
-    loadData();
-
-    function openDept(dept) {
-        document.getElementById('home-section').style.display = 'none';
-        document.getElementById('directory-section').style.display = 'block';
-        document.getElementById('dept-name').innerText = dept;
-        const filtered = staffData.filter(p => (p.Department || '').toLowerCase().includes(dept.toLowerCase().split(' ')[0]));
-        render(filtered);
-    }
-
-    function search() {
-        const query = document.getElementById('searchBox').value.toLowerCase();
-        if(query.length > 2) {
-            document.getElementById('home-section').style.display = 'none';
-            document.getElementById('directory-section').style.display = 'block';
-            document.getElementById('dept-name').innerText = "Search Results";
-            const filtered = staffData.filter(p => p.Name.toLowerCase().includes(query) || p.Role.toLowerCase().includes(query));
-            render(filtered);
-        }
-    }
-
-    function render(list) {
-        const div = document.getElementById('list-container');
-        div.innerHTML = list.length ? "" : "<h3>No staff found.</h3>";
-        list.sort((a,b) => a.Name.localeCompare(b.Name)).forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.onclick = () => openPopUp(p); // Makes the whole card clickable
-            card.innerHTML = `
-                <div>
-                    <h3 style="margin:0; color:var(--blue);">${p.Name}</h3>
-                    <p style="margin:5px 0 0;">${p.Role}</p>
-                </div>
-                <div style="color:var(--blue); opacity: 0.5;"><i class="fa-solid fa-chevron-right"></i></div>
-            `;
-            div.appendChild(card);
-        });
-    }
-
-    function openPopUp(person) {
-        document.getElementById('popName').innerText = person.Name;
-        document.getElementById('popRole').innerText = person.Role;
-        document.getElementById('popOffice').innerText = person.Office || 'N/A';
-        document.getElementById('popEmail').innerText = person.Email;
-        document.getElementById('popPhone').innerText = person.Phone || 'N/A';
-        document.getElementById('mailLink').href = `mailto:${person.Email}`;
-        document.getElementById('callLink').href = `tel:${person.Phone}`;
-        document.getElementById('modalOverlay').style.display = 'flex';
-    }
-
-    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-    function goHome() {
-        document.getElementById('home-section').style.display = 'block';
-        document.getElementById('directory-section').style.display = 'none';
-    }
-</script>
-
-</body>
-</html>
-       
-       
-       
-                
+            <div class="tile" onclick="openDept('Circuit')">
 
           
     
